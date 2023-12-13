@@ -1,5 +1,3 @@
-import sys
-
 from board import Board
 from validators import validate_coords, validate_size
 
@@ -46,7 +44,7 @@ def main() -> None:
                 break
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:

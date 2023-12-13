@@ -1,5 +1,4 @@
 class Board:
-
     def __init__(self, size: int = 3) -> None:
         self.size = size
         self.board = [[" " for x in range(self.size)] for y in range(self.size)]
@@ -18,10 +17,10 @@ class Board:
         print()
 
     def place_sign(self, x: int, y: int) -> None:
-        if self.board[x][y] == ' ':
+        if self.board[x][y] == " ":
             self.board[x][y] = self.next_sign
             self.last_coords = (x, y)
-            self.next_sign = 'O' if self.next_sign == 'X' else 'X'
+            self.next_sign = "O" if self.next_sign == "X" else "X"
         else:
             raise ValueError("This place is already taken.")
 
@@ -55,8 +54,8 @@ class Board:
 
     @staticmethod
     def _check_cell(cell: str, _sum: int) -> int:
-        if cell == '0':
+        if cell == "0":
             _sum += 1
-        elif cell == 'X':
+        elif cell == "X":
             _sum -= 1
         return _sum
