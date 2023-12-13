@@ -50,7 +50,7 @@ class Board:
             sum_diagonal_two = self._check_cell(cell2, sum_diagonal_two)
         if any(abs(val) == self.size for val in [sum_diagonal_one, sum_diagonal_two]):
             return True
-        
+
         return False
 
     @staticmethod
