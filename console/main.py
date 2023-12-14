@@ -1,5 +1,12 @@
+import os
+from subprocess import call
+
 from board import Board
 from validators import validate_coords, validate_size
+
+
+def clear_screen() -> None:
+    call("clear" if os.name == "posix" else "cls")
 
 
 def get_board_size() -> int:
@@ -31,6 +38,7 @@ def main() -> None:
     size = get_board_size()
     board = Board(size)
     while True:
+        clear_screen()
         board.show_board()
         coords = get_coordinates(board.size)
         try:
@@ -39,6 +47,7 @@ def main() -> None:
             print(str(ex))
         else:
             if board.check_winner():
+                clear_screen()
                 board.show_board()
                 print("You won!")
                 break
