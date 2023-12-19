@@ -13,8 +13,10 @@ Just a fun project to code a simple Tic-Tac-Toe game. However, I created two gam
 
 I wanted to test out the PyGame lib and also practise some design patterns. Thanks to this motive I
 was able to add the following design patterns:
-- State (The game class can have 3 states: PRE_GAME, GAME, POST_GAME based on which the game behaves differently
+- State - the game class can have 3 states: PRE_GAME, GAME, POST_GAME based on which the game behaves differently
 (shows different windows))
+- FlyWeight - Used when loading symbol images so that we load them only once instead of each time creating
+a new symbol on the board
 
 
 ## Local development using virtualenv

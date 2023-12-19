@@ -7,22 +7,23 @@ from pygame.rect import Rect
 from desktop.config import STATICS_DIR
 from desktop.consts import CHANGE_TO_GAME_STATE, CHANGE_TO_POST_GAME_STATE, GameState
 from desktop.elements.board import Board
-from desktop.elements.sprites import Sign
+from desktop.elements.enums import Symbol
+from desktop.elements.sprites import Marker
 
 logger = getLogger(__name__)
 
 
 class Game:
     def __init__(self) -> None:
-        pygame.display.set_caption("Tic-tac-toe")
         self.sign_size = 158
         grid_size = self.sign_size * 3
         self.width, self.height = size = (grid_size, grid_size + 100)
+        pygame.display.set_caption("Tic-tac-toe")
         self.screen = pygame.display.set_mode(size)
         self.state = GameState.PRE_GAME
         self.font = pygame.font.Font(f"{STATICS_DIR}/fonts/Pixeltype.ttf", 50)
-        self.score = [0, 0]
-        self.player_who_won = 0
+        self.score = {Symbol.PLAYER_ONE: 0, Symbol.PLAYER_TWO: 0}
+        self.player_who_won = None
         self.cooldown = 0
         self.board = Board()
         self.x_signs = pygame.sprite.Group()
@@ -71,13 +72,13 @@ class Game:
 
     def _handle_game(self) -> None:
         """Handle actual game of tic-tac-toe."""
+        score_one = self.score[Symbol.PLAYER_ONE]
+        score_two = self.score[Symbol.PLAYER_TWO]
         blocks = {
-            f"Pad1   {self.score[0]}: {self.score[1]}   Pad2": {
-                "midtop": (self.width / 2, 50),
-            },
+            f"Pad1   {score_one}: {score_two}   Pad2": {"midtop": (self.width / 2, 50)},
         }
-        self.screen.fill((0, 0, 0))
 
+        self.screen.fill((0, 0, 0))
         self._render_text_blocks(blocks)
         self._draw_board_lines()
         rects = self._draw_board()
@@ -92,26 +93,30 @@ class Game:
             pos = pygame.mouse.get_pos()
             for index, rect in enumerate(rects):
                 if rect.collidepoint(pos) and not self.cooldown:
-                    self._place_next_sign(index, rect)
+                    self._place_next_symbol(index, rect)
 
         if self.board.check_winner():
             logger.debug("We have a winner!")
-            self.player_who_won = 0 if self.board.next_sign == "O" else 1
+            player_who_won = Symbol.PLAYER_ONE
+            if self.board.next_player == Symbol.PLAYER_ONE:
+                player_who_won = Symbol.PLAYER_TWO
+
+            self.player_who_won = player_who_won
             self.score[self.player_who_won] += 1
             post(Event(CHANGE_TO_POST_GAME_STATE, {"state": GameState.POST_GAME}))
 
     def _handle_post_game(self) -> None:
         """Handle post game state after someone wins."""
+        score_one = self.score[Symbol.PLAYER_ONE]
+        score_two = self.score[Symbol.PLAYER_TWO]
         blocks = {
-            f"Pad1   {self.score[0]}: {self.score[1]}   Pad2": {
-                "midtop": (self.width / 2, 50),
-            },
+            f"Pad1   {score_one}: {score_two}   Pad2": {"midtop": (self.width / 2, 50)},
             "Press space to play again": {
                 "midbottom": (self.width / 2, self.height - 150)
             },
         }
-        self.screen.fill("black")
 
+        self.screen.fill("black")
         self._draw_board_lines()
         self._draw_board(win_state=True)
         self._render_text_blocks(blocks)
@@ -122,21 +127,21 @@ class Game:
             self._cleanup()
             post(Event(CHANGE_TO_GAME_STATE, {"state": GameState.GAME}))
 
-    def _place_next_sign(self, index: int, rect: Rect) -> None:
+    def _place_next_symbol(self, index: int, rect: Rect) -> None:
         logger.debug(f"collision with: {index}")
         self.cooldown = 60
         x, y = (index // self.board.size, index % self.board.size)
-        next_sign = self.board.next_sign
+        next_player = self.board.next_player
         try:
             self.board.place_sign(x, y)
         except ValueError:
             return
 
-        logger.debug(f"Add {next_sign} sign")
-        if next_sign == "X":
-            self.x_signs.add(Sign(0, center=rect.center))
-        else:
-            self.o_signs.add(Sign(1, center=rect.center))
+        logger.debug(f"Add {next_player} sign")
+        group = self.x_signs
+        if next_player == Symbol.PLAYER_TWO:
+            group = self.o_signs
+        Marker(next_player, rect.center, group)
 
     def _draw_board(self, win_state: bool = False) -> list[Rect]:
         """Draw tic-tac-toe board."""

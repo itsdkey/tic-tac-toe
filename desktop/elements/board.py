@@ -1,5 +1,7 @@
 from logging import getLogger
 
+from desktop.elements.enums import Symbol
+
 logger = getLogger(__name__)
 
 
@@ -7,7 +9,7 @@ class Board:
     def __init__(self, size: int = 3) -> None:
         self.size = size
         self.board = [[None for x in range(self.size)] for y in range(self.size)]
-        self.next_sign = "X"
+        self.next_player = Symbol.PLAYER_ONE
         self.last_coords = tuple()
 
     def clear(self) -> None:
@@ -25,9 +27,13 @@ class Board:
 
     def place_sign(self, x: int, y: int) -> None:
         if self.board[x][y] is None:
-            self.board[x][y] = self.next_sign
+            self.board[x][y] = str(self.next_player)
             self.last_coords = (x, y)
-            self.next_sign = "X" if self.next_sign == "O" else "O"
+            self.next_player = (
+                Symbol.PLAYER_ONE
+                if self.next_player == Symbol.PLAYER_TWO
+                else Symbol.PLAYER_TWO
+            )
             self.show_board()
         else:
             raise ValueError("This place is already taken.")
@@ -59,8 +65,8 @@ class Board:
 
     @staticmethod
     def _check_cell(cell: str, _sum: int) -> int:
-        if cell == "X":
+        if cell == str(Symbol.PLAYER_ONE):
             _sum -= 1
-        elif cell == "O":
+        elif cell == str(Symbol.PLAYER_TWO):
             _sum += 1
         return _sum
