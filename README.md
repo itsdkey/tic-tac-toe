@@ -1,6 +1,7 @@
 # tic-tac-toe
 
 * [Intuition](#intuition)
+* [Technologies](#technologies-i-used)
 * [Local development](#local-development-using-virtualenv)
     * [using virtualenv](#local-development-using-virtualenv)
     * [using docker compose](#local-development-using-docker-compose)
@@ -17,6 +18,11 @@ was able to add the following design patterns:
 (shows different windows))
 - FlyWeight - Used when loading symbol images so that we load them only once instead of each time creating
 a new symbol on the board
+
+
+## Technologies I used
+To keep things simple and to learn as much as I can I decided to only use:
+- [PyGame](https://www.pygame.org/news) for the game development
 
 
 ## Local development using virtualenv
